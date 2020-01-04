@@ -17,10 +17,10 @@
 			$this->button_table_action = true;
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
-			$this->button_add = true;
-			$this->button_edit = true;
-			$this->button_delete = true;
-			$this->button_detail = true;
+			$this->button_add = false;
+			$this->button_edit = false;
+			$this->button_delete = false;
+			$this->button_detail = false;
 			$this->button_show = true;
 			$this->button_filter = true;
 			$this->button_import = false;
@@ -33,6 +33,15 @@
 			$this->col[] = ["label"=>"Id Kelas","name"=>"Id_Kelas","join"=>"kelas,Nama"];
 			$this->col[] = ["label"=>"Id Jadwal","name"=>"Id_Jadwal","join"=>"jam,Jam"];
 			$this->col[] = ["label"=>"Hari","name"=>"Hari"];
+			$this->col[] = ["label"=>"Dosen, Matakuliah","name"=>"id_dos_mat","callback"=>function($row) {
+				if(!empty($row->id_dos_mat)){
+					$dosmat=DB::table('dos_mat')->find($row->id_dos_mat);
+					$dosen=DB::table('dosen')->find($dosmat->Id_Dosen);
+					$matkul=DB::table('matkul')->find($dosmat->Id_Matkul);
+					return $dosen->Nama.", ".$matkul->Nama;
+				}
+				return '';
+				}];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
@@ -74,6 +83,26 @@
 	        | 
 	        */
 	        $this->addaction = array();
+	        $this->addaction[] = [
+				'label'=>'Kosong',
+				'url'=>('#')."[Id_Kelas]",
+				'color'=>'success',
+				'showIf'=>"[id_dos_mat] == null",
+			];
+
+	        $this->addaction[] = [
+				'label'=>'Terisi',
+				'url'=>('#'),
+				'color'=>'danger',
+				'showIf'=>"[id_dos_mat] != null and [id_dos_mat] != ".$_GET['id'],
+			];
+
+	        $this->addaction[] = [
+				'label'=>'Diambil',
+				'url'=>('#'),
+				'color'=>'info',
+				'showIf'=>"[id_dos_mat] != null and [id_dos_mat] == ".$_GET['id'],
+			];
 
 
 	        /* 
@@ -86,8 +115,14 @@
 	        | Then about the action, you should code at actionButtonSelected method 
 	        | 
 	        */
-	        $this->button_selected = array();
-
+			$this->button_selected = array();
+			$JatahSKS=DB::table('dos_mat')->find($_GET['id']);
+			$JatahSKS=DB::table('matkul')->find($JatahSKS->Id_Matkul);
+			$JumSKS=DB::table('kelas_jam')->where('id_dos_mat',$_GET['id'])->count();
+			if($JatahSKS->SKS > $JumSKS){
+				$this->button_selected[] = ['label'=>'Ambil Jadwal','icon'=>'fa fa-check','name'=>'ambil|'.$_GET['id']];
+			}
+			$this->button_selected[] = ['label'=>'Hapus','icon'=>'fa fa-remove','name'=>'hapus|'.$_GET['id']];
 	                
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -218,8 +253,29 @@
 	    |
 	    */
 	    public function actionButtonSelected($id_selected,$button_name) {
-	        //Your code here
-	            
+			//Your code here
+			$button_name=explode('|',$button_name);
+			$data=$button_name[1];
+			$button_name=$button_name[0];
+			if($button_name == 'ambil') {
+				$JatahSKS=DB::table('dos_mat')->find($data);
+				$JatahSKS=DB::table('matkul')->find($JatahSKS->Id_Matkul);
+				$JumSKS=DB::table('kelas_jam')->where('id_dos_mat',$data)->count()+count($id_selected);
+				if($JatahSKS->SKS < $JumSKS){
+					return CRUDBooster::redirect(url('admin/kelas_jam?id='.$data),"Melebihi Jumlah SKS", 'warning');
+					exit();
+				}
+				$cekKelas=DB::table('kelas_jam')->whereIn('id',$id_selected)->where('id_dos_mat','!=','0')->count();
+				if($cekKelas == 0)
+					DB::table('kelas_jam')->whereIn('id',$id_selected)->update(['id_dos_mat'=>$data]);
+				else{
+					return CRUDBooster::redirect(url('admin/kelas_jam?id='.$data),"Kelas Sudah Diambil Sebelumnya", 'danger');
+					exit();
+				}
+			}
+			if($button_name == 'hapus') {
+				DB::table('kelas_jam')->whereIn('id',$id_selected)->where('id_dos_mat',$data)->update(['id_dos_mat'=>null]);
+			}
 	    }
 
 

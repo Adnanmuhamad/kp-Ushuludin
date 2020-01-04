@@ -32,6 +32,19 @@
 			$this->col = [];
 			$this->col[] = ["label"=>"Id Dosen","name"=>"Id_Dosen","join"=>"dosen,Nama"];
 			$this->col[] = ["label"=>"Id Matkul","name"=>"Id_Matkul","join"=>"matkul,Nama"];
+			$this->col[] = ["label"=>"Kelas, Hari, Jam ","name"=>"","callback"=>function($row) {
+				$jadwal=DB::table('kelas_jam')->where('id_dos_mat',$row->id)->get();
+				if(count($jadwal)){
+					$t_jadwal=null;
+					foreach($jadwal as $j){
+						$kelas=DB::table('kelas')->find($j->Id_Kelas);
+						$jam=DB::table('jam')->find($j->Id_Jadwal);
+						$t_jadwal.=$kelas->Nama.", ".$j->Hari.", ".$jam->Jam."<br>";
+					}
+					return $t_jadwal;
+				}
+				return 'Kosong';
+				}];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
@@ -60,6 +73,7 @@
 	        | 
 	        */
 	        $this->sub_module = array();
+			// $this->sub_module[] = ['label'=>'Jadwal','path'=>'kelas_jam','parent_columns'=>'id','foreign_key'=>'id_dos_mat','button_color'=>'success','button_icon'=>'fa fa-bars'];
 
 
 	        /* 
@@ -74,6 +88,11 @@
 	        | 
 	        */
 	        $this->addaction = array();
+	        $this->addaction[] = [
+				'label'=>'Jadwal',
+				'url'=>url('admin/kelas_jam?id=[id]'),
+				'color'=>'success',
+			];
 
 
 	        /* 

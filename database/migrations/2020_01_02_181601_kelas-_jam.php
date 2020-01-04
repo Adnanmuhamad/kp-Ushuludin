@@ -18,7 +18,7 @@ class KelasJam extends Migration
             $table->integer('Id_Kelas');
             $table->integer('Id_Jadwal');
             $table->integer('id_dos_mat')->nullable();
-            $table->integer('Hari');
+            $table->string('Hari');
             $table->timestamps();
         });
     }

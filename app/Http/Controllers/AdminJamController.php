@@ -272,11 +272,11 @@
 				foreach($datajam as $jam){
 
 			DB::table('kelas_jam')->insert([
-				['id_Kelas' => $kelas->id , 'id_Jadwal' => $jam->id , 'Hari' => 1],
-				['id_Kelas' => $kelas->id , 'id_Jadwal' => $jam->id , 'Hari' => 2],
-				['id_Kelas' => $kelas->id , 'id_Jadwal' => $jam->id , 'Hari' => 3],
-				['id_Kelas' => $kelas->id , 'id_Jadwal' => $jam->id , 'Hari' => 4],
-				['id_Kelas' => $kelas->id , 'id_Jadwal' => $jam->id , 'Hari' => 5],
+				['id_Kelas' => $kelas->id , 'id_Jadwal' => $jam->id , 'Hari' => 'Senin'],
+				['id_Kelas' => $kelas->id , 'id_Jadwal' => $jam->id , 'Hari' => 'Selasa'],
+				['id_Kelas' => $kelas->id , 'id_Jadwal' => $jam->id , 'Hari' => 'Rabu'],
+				['id_Kelas' => $kelas->id , 'id_Jadwal' => $jam->id , 'Hari' => 'Kamis'],
+				['id_Kelas' => $kelas->id , 'id_Jadwal' => $jam->id , 'Hari' => 'Jumat'],
 			]);
 			}
 			}
@@ -305,7 +305,24 @@
 	    */
 	    public function hook_after_edit($id) {
 	        //Your code here 
+			$datakelas=DB::table('kelas')->get();
+			$datajam=DB::table('jam')->get();
 
+			
+			DB::table('kelas_jam')->delete();
+
+			foreach($datakelas as $kelas){
+				foreach($datajam as $jam){
+
+			DB::table('kelas_jam')->insert([
+				['id_Kelas' => $kelas->id , 'id_Jadwal' => $jam->id , 'Hari' => 'Senin'],
+				['id_Kelas' => $kelas->id , 'id_Jadwal' => $jam->id , 'Hari' => 'Selasa'],
+				['id_Kelas' => $kelas->id , 'id_Jadwal' => $jam->id , 'Hari' => 'Rabu'],
+				['id_Kelas' => $kelas->id , 'id_Jadwal' => $jam->id , 'Hari' => 'Kamis'],
+				['id_Kelas' => $kelas->id , 'id_Jadwal' => $jam->id , 'Hari' => 'Jumat'],
+			]);
+			}
+			}
 	    }
 
 	    /* 
