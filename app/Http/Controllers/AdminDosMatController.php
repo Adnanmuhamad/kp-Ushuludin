@@ -23,23 +23,45 @@
 			$this->button_detail = true;
 			$this->button_show = true;
 			$this->button_filter = true;
-			$this->button_import = false;
-			$this->button_export = false;
+			$this->button_import = true;
+			$this->button_export = true;
 			$this->table = "dos_mat";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"Id Dosen","name"=>"Id_Dosen","join"=>"dosen,Nama"];
 			$this->col[] = ["label"=>"Id Matkul","name"=>"Id_Matkul","join"=>"matkul,Nama"];
-			$this->col[] = ["label"=>"Kelas, Hari, Jam ","name"=>"","callback"=>function($row) {
+			$this->col[] = ["label"=>"Kelas","name"=>"","callback"=>function($row) {
 				$jadwal=DB::table('kelas_jam')->where('id_dos_mat',$row->id)->get();
 				if(count($jadwal)){
 					$t_jadwal=null;
 					foreach($jadwal as $j){
 						$kelas=DB::table('kelas')->find($j->Id_Kelas);
+						$t_jadwal.=$kelas->Nama."<br>";
+					}
+					return $t_jadwal;
+				}
+				return 'Kosong';
+				}];
+			$this->col[] = ["label"=>"Hari","name"=>"","callback"=>function($row) {
+				$jadwal=DB::table('kelas_jam')->where('id_dos_mat',$row->id)->get();
+				if(count($jadwal)){
+					$t_jadwal=null;
+					foreach($jadwal as $j){
+						$kelas=DB::table('kelas')->find($j->Id_Kelas);
+						$t_jadwal.=$j->Hari."<br>";
+					}
+					return $t_jadwal;
+				}
+				return 'Kosong';
+				}];
+			$this->col[] = ["label"=>"Jam","name"=>"","callback"=>function($row) {
+				$jadwal=DB::table('kelas_jam')->where('id_dos_mat',$row->id)->get();
+				if(count($jadwal)){
+					$t_jadwal=null;
+					foreach($jadwal as $j){
 						$jam=DB::table('jam')->find($j->Id_Jadwal);
-						$t_jadwal.=$kelas->Nama.", ".$j->Hari.", ".$jam->Jam."<br>";
+						$t_jadwal.=$jam->Jam."<br>";
 					}
 					return $t_jadwal;
 				}

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class Dosen extends Migration
+class Jurusan extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,9 @@ class Dosen extends Migration
      */
     public function up()
     {
-        Schema::create('Dosen', function (Blueprint $table) {
+        Schema::create('Jurusan', function (Blueprint $table) {
             $table->increments('id');
-            $table->bigInteger('NIP');
             $table->string('Nama');
-            $table->integer('Jurusan_id');
             $table->timestamps();
         });
     }
@@ -29,6 +27,6 @@ class Dosen extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('Dosen');
+        //
     }
 }
